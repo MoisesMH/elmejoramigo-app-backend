@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+    persistence:
+        image: postgres
+        container_name: mascotasdb
+        environment:
+            POSTGRES_DB: "mascotasDB"
+            POSTGRES_PASSWORD: "postgres"
+        ports:
+            - 5432:5432
+        volumes:
+            - pgconf:/etc/postgresql
+            - pglogs:/var/log/postgresql
+            - pgdata:/var/lib/postgresql/data
+        deploy:
+            restart_policy:
+                condition: on-failure
+    
+    pgadmin:
+        image: dpage/pgadmin4
+        container_name: pgadmin1
+        ports:
+            - 8080:80
+        environment:
+            PGADMIN_DEFAULT_EMAIL: "name@example.com"
+            PGADMIN_DEFAULT_PASSWORD: "admin"
+        volumes:
+            - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+    pgconf:
+    pglogs:
+    pgdata:
+    pgadmin-data:

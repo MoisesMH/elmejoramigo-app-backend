@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  name     String?   @db.VarChar(100)
+  email    String    @unique @db.VarChar(100)
+  password String
+  phone    String?    
+  posts    Post[]
+
+  @@map("users")
+}
+
+model Post {
+  id                Int                @id @default(autoincrement()) @map("post_id")
+  created_at        DateTime?          @default(now()) @db.Timestamptz(6)
+  title             String             @db.VarChar(100)
+  content           String?
+  owner_id          Int?               
+  user              User?              @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pet_id            Int?               @unique
+  pet               Pet?               @relation(fields: [pet_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("posts")
+}
+
+model Pet {
+  id              Int             @id @default(autoincrement()) @map("pet_id")
+  name            String          @db.VarChar(100)
+  birth           DateTime?
+  age             Int?            
+  sex             String?
+  height          Int?
+  type_id         Int?            @unique(map: "PetHasUniqueType_constraint")
+  // owner_id     Int?
+  // breed
+  type            Pet_Type?       @relation(fields: [type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  // user          User?           @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  post            Post?
+  photos          Photo[]
+
+  @@map("pet")
+}
+
+model Pet_Type {
+  id            Int             @id @default(autoincrement()) @map("type_id")
+  type          String
+  pet           Pet?
+
+  @@map("pet_type")
+}
+
+// model Pet_Breed {
+//   id
+//   breed
+//   type_id
+//   type        Pet_Type
+// }
+
+model Photo {
+  id        Int             @id @default(autoincrement()) @map("photo_id")
+  name      String
+  uri       String
+  pets      Pet[]
+
+  @@map("photos")
+}
